@@ -1,0 +1,12 @@
+[package]
+name = "rust-simple-chess"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chess-gui = { path = "crates/chess_gui" }
+chess-core = { path = "crates/chess_core" }
+eframe = "0.33.3"
+egui = "0.33.3"

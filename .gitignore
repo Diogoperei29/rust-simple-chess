@@ -1,0 +1,34 @@
+# Rust build artifacts
+/target
+**/target/
+
+# Cargo lock file (for libraries, commit for binaries)
+# Cargo.lock
+
+# Backup files
+**/*.rs.bk
+**/*.bk
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Debug files
+*.pdb
+
+# RLS and rust-analyzer
+**/.rust-analyzer/
+**/.cargo/
+
+# Test and benchmark data
+/test-results
+/benches/results
+
+# Operating system files
+Thumbs.db
+.Spotlight-V100
+.Trashes
