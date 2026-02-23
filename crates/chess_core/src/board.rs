@@ -7,18 +7,18 @@ pub struct Board {
     castle_king_side_white: bool,
     castle_queen_side_white: bool,
     castle_king_side_black: bool,
-    castle_queen_side_black: bool
+    castle_queen_side_black: bool,
 }
 
 impl Board {
     pub fn new() -> Self {
-        Self { 
+        Self {
             squares: [[None; 8]; 8],
             en_passant: None,
             castle_king_side_white: true,
             castle_queen_side_white: true,
             castle_king_side_black: true,
-            castle_queen_side_black: true
+            castle_queen_side_black: true,
         }
     }
 
@@ -26,16 +26,36 @@ impl Board {
         let mut board = Self::new();
 
         for file in 0..8 {
-            board.set_piece(Square::new(1, file).unwrap(), Some(Piece::new(Color::White, PieceType::Pawn)));
-            board.set_piece(Square::new(6, file).unwrap(), Some(Piece::new(Color::Black, PieceType::Pawn)));
-        } 
+            board.set_piece(
+                Square::new(1, file).unwrap(),
+                Some(Piece::new(Color::White, PieceType::Pawn)),
+            );
+            board.set_piece(
+                Square::new(6, file).unwrap(),
+                Some(Piece::new(Color::Black, PieceType::Pawn)),
+            );
+        }
 
-        let back_rank = [ PieceType::Rook, PieceType::Knight, PieceType::Bishop, PieceType::Queen,
-                          PieceType::King, PieceType::Bishop, PieceType::Knight, PieceType::Rook ];
-        
+        let back_rank = [
+            PieceType::Rook,
+            PieceType::Knight,
+            PieceType::Bishop,
+            PieceType::Queen,
+            PieceType::King,
+            PieceType::Bishop,
+            PieceType::Knight,
+            PieceType::Rook,
+        ];
+
         for (file, &piece_type) in back_rank.iter().enumerate() {
-            board.set_piece(Square::new(0, file as u8).unwrap(), Some(Piece::new(Color::White, piece_type)));
-            board.set_piece(Square::new(7, file as u8).unwrap(), Some(Piece::new(Color::Black, piece_type)));
+            board.set_piece(
+                Square::new(0, file as u8).unwrap(),
+                Some(Piece::new(Color::White, piece_type)),
+            );
+            board.set_piece(
+                Square::new(7, file as u8).unwrap(),
+                Some(Piece::new(Color::Black, piece_type)),
+            );
         }
 
         board
@@ -54,25 +74,23 @@ impl Board {
             return false;
         }
 
-        return (piece.color == Color::White && from.rank() == 1 && to.rank() == 3) || 
-               (piece.color == Color::Black && from.rank() == 6 && to.rank() == 4);
+        return (piece.color == Color::White && from.rank() == 1 && to.rank() == 3)
+            || (piece.color == Color::Black && from.rank() == 6 && to.rank() == 4);
     }
 
     fn is_move_a_castle(&self, from_piece: Piece, from: Square, to: Square) -> bool {
         if from_piece.piece_type != PieceType::King {
-            return false
+            return false;
         }
 
         // white king moves to castle
-        if from.rank_file() == (0, 4) && 
-           (to.rank_file() == (0, 2) || to.rank_file() == (0, 6)) {
-            return true
+        if from.rank_file() == (0, 4) && (to.rank_file() == (0, 2) || to.rank_file() == (0, 6)) {
+            return true;
         }
 
         // black king moves to castle
-        if from.rank_file() == (7, 4) && 
-           (to.rank_file() == (7, 2) || to.rank_file() == (7, 6)) {
-            return true
+        if from.rank_file() == (7, 4) && (to.rank_file() == (7, 2) || to.rank_file() == (7, 6)) {
+            return true;
         }
 
         false
@@ -80,23 +98,23 @@ impl Board {
 
     fn move_rook_to_castle(&mut self, king_to: Square) {
         let (rook_square, rook_to) = match king_to.rank_file() {
-            (0, 2) => {
-                ( Square::new(0,0).expect("0,0 always valid"),
-                  Square::new(0,3).expect("0,3 always valid") )
-            },
-            (0, 6) => {
-                ( Square::new(0,7).expect("0,7 always valid"),
-                  Square::new(0,5).expect("0,5 always valid") )
-            },
-            (7, 2) => {
-                ( Square::new(7,0).expect("7,0 always valid"),
-                  Square::new(7,3).expect("7,3 always valid") )
-            },
-            (7, 6) => {
-                ( Square::new(7,7).expect("7,7 always valid"),
-                  Square::new(7,5).expect("7,5 always valid") )
-            },
-            _ => return
+            (0, 2) => (
+                Square::new(0, 0).expect("0,0 always valid"),
+                Square::new(0, 3).expect("0,3 always valid"),
+            ),
+            (0, 6) => (
+                Square::new(0, 7).expect("0,7 always valid"),
+                Square::new(0, 5).expect("0,5 always valid"),
+            ),
+            (7, 2) => (
+                Square::new(7, 0).expect("7,0 always valid"),
+                Square::new(7, 3).expect("7,3 always valid"),
+            ),
+            (7, 6) => (
+                Square::new(7, 7).expect("7,7 always valid"),
+                Square::new(7, 5).expect("7,5 always valid"),
+            ),
+            _ => return,
         };
 
         let rook_piece = self.get_piece(rook_square);
@@ -106,7 +124,7 @@ impl Board {
 
     fn verify_and_move_en_passant(&mut self, from_piece: Piece, to: Square) {
         if from_piece.piece_type != PieceType::Pawn {
-            return
+            return;
         }
 
         // if from_p is attacking en_passant square
@@ -128,7 +146,7 @@ impl Board {
                 Color::Black => {
                     self.castle_king_side_black = false;
                     self.castle_queen_side_black = false;
-                },
+                }
                 Color::White => {
                     self.castle_king_side_white = false;
                     self.castle_queen_side_white = false;
@@ -142,7 +160,7 @@ impl Board {
                 (0, 7) => self.castle_king_side_white = false,
                 (7, 0) => self.castle_queen_side_black = false,
                 (7, 7) => self.castle_king_side_black = false,
-                _ => return
+                _ => return,
             };
         }
     }
@@ -150,7 +168,7 @@ impl Board {
     pub fn make_move(&mut self, from: Square, to: Square) {
         let from_piece = match self.get_piece(from) {
             Some(p) => p,
-            None => return
+            None => return,
         };
         // move piece
         self.set_piece(to, Some(from_piece));
@@ -168,66 +186,68 @@ impl Board {
         self.update_castling_allowance(from_piece, from);
 
         // update en_passant after every move
-        self.en_passant = None; 
+        self.en_passant = None;
         if self.move_allows_en_passant(from_piece, from, to) {
             self.en_passant = Some(to);
         }
     }
-    
+
     pub fn is_checkmated(&self, color: Color) -> bool {
         if !self.is_king_in_check(color) {
             return false;
         }
-        
+
         for square in self.get_all_color_squares(color) {
             if !self.get_valid_moves(square).is_empty() {
                 return false;
             }
         }
-        
+
         true
     }
-    
+
     pub fn is_stalemate(&self, color: Color) -> bool {
         if self.is_king_in_check(color) {
             return false;
         }
-        
+
         for square in self.get_all_color_squares(color) {
             if !self.get_valid_moves(square).is_empty() {
                 return false;
             }
         }
-        
+
         true
     }
-    
+
     pub fn get_valid_moves(&self, square: Square) -> Vec<Square> {
-        let piece = match self.get_piece(square) { 
+        let piece = match self.get_piece(square) {
             Some(p) => p,
-            None => return Vec::new()
+            None => return Vec::new(),
         };
-        
+
         let mut valid_moves = Vec::new();
         let unchecked_moves: Vec<Square> = self.get_all_unchecked_moves(square);
         for new_square in unchecked_moves {
             let mut new_board = self.clone();
             new_board.make_move(square, new_square);
-            
+
             if !new_board.is_king_in_check(piece.color) {
                 valid_moves.push(new_square);
             }
         }
-        
+
         valid_moves
     }
-    
-    fn is_square_in_check(&self, check_square: Square, color: Color) -> bool{
+
+    fn is_square_in_check(&self, check_square: Square, color: Color) -> bool {
         for rank in 0..8 {
             for file in 0..8 {
                 if let Ok(square) = Square::new(rank, file) {
                     if let Some(piece) = self.get_piece(square) {
-                        if piece.opposite_color() == color && self.can_attack_square(square, check_square) {
+                        if piece.opposite_color() == color
+                            && self.can_attack_square(square, check_square)
+                        {
                             return true;
                         }
                     }
@@ -241,29 +261,30 @@ impl Board {
     pub fn is_king_in_check(&self, color: Color) -> bool {
         let king_square = match self.find_king_square(color) {
             Some(p) => p,
-            None => return true
+            None => return true,
         };
-        
+
         self.is_square_in_check(king_square, color)
     }
 
     fn can_king_side_castle(&self, color: Color) -> bool {
         // If any of the pieces aready moved: cannot castle
-        if (color == Color::White && !self.castle_king_side_white) || 
-           (color == Color::Black && !self.castle_king_side_black) {
+        if (color == Color::White && !self.castle_king_side_white)
+            || (color == Color::Black && !self.castle_king_side_black)
+        {
             return false;
-        } 
-        let empty_squares = if color == Color::White { 
-            vec![ (0, 5), (0, 6) ]
-        } else { 
-            vec![ (7, 5), (7, 6) ]
+        }
+        let empty_squares = if color == Color::White {
+            vec![(0, 5), (0, 6)]
+        } else {
+            vec![(7, 5), (7, 6)]
         };
-        let check_squares = if color == Color::White { 
-            vec![ (0, 4), (0, 5), (0, 6) ]
-        } else { 
-            vec![ (7, 4), (7, 5), (7, 6) ]
+        let check_squares = if color == Color::White {
+            vec![(0, 4), (0, 5), (0, 6)]
+        } else {
+            vec![(7, 4), (7, 5), (7, 6)]
         };
-        
+
         // If there is a piece between King and Rook: cannot castle
         for (rank, file) in empty_squares {
             if let Ok(square) = Square::new(rank, file) {
@@ -283,26 +304,26 @@ impl Board {
         }
 
         true
-
     }
-    
+
     fn can_queen_side_castle(&self, color: Color) -> bool {
         // If any of the pieces aready moved: cannot castle
-        if (color == Color::White && !self.castle_queen_side_white) || 
-           (color == Color::Black && !self.castle_queen_side_black) {
+        if (color == Color::White && !self.castle_queen_side_white)
+            || (color == Color::Black && !self.castle_queen_side_black)
+        {
             return false;
-        } 
-        let empty_squares = if color == Color::White { 
-            vec![ (0, 1), (0, 2), (0, 3) ]
-        } else { 
-            vec![ (7, 1), (7, 2), (7, 3) ]
+        }
+        let empty_squares = if color == Color::White {
+            vec![(0, 1), (0, 2), (0, 3)]
+        } else {
+            vec![(7, 1), (7, 2), (7, 3)]
         };
-        let check_squares = if color == Color::White { 
-            vec![ (0, 2), (0, 3), (0, 4) ]
-        } else { 
-            vec![ (7, 2), (7, 3), (7, 4) ]
+        let check_squares = if color == Color::White {
+            vec![(0, 2), (0, 3), (0, 4)]
+        } else {
+            vec![(7, 2), (7, 3), (7, 4)]
         };
-        
+
         // If there is a piece between King and Rook: cannot castle
         for (rank, file) in empty_squares {
             if let Ok(square) = Square::new(rank, file) {
@@ -322,10 +343,9 @@ impl Board {
         }
 
         true
-
     }
 
-    fn get_all_color_squares(&self, color: Color) -> Vec<Square>{
+    fn get_all_color_squares(&self, color: Color) -> Vec<Square> {
         let mut all_color_squared: Vec<Square> = Vec::new();
         for rank in 0..8 {
             for file in 0..8 {
@@ -344,7 +364,7 @@ impl Board {
 
     fn can_sliding_piece_reach(&self, from: Square, to: Square, piece: Piece) -> bool {
         let offsets = piece.piece_type.get_offsets();
-        
+
         for &(rank_offset, file_offset) in offsets {
             for radius in 1..8 {
                 if let Ok(square) = from.offset(radius * rank_offset, radius * file_offset) {
@@ -355,7 +375,7 @@ impl Board {
                     if self.get_piece(square).is_some() {
                         break;
                     }
-                } else { 
+                } else {
                     break;
                 }
             }
@@ -364,7 +384,7 @@ impl Board {
     }
 
     fn get_sliding_moves(&self, from: Square, piece: Piece) -> Vec<Square> {
-        let mut all_moves= Vec::new();
+        let mut all_moves = Vec::new();
 
         for &(rank_offset, file_offset) in piece.piece_type.get_offsets() {
             for radius in 1..8 {
@@ -374,11 +394,11 @@ impl Board {
                         if other_piece.color == piece.opposite_color() {
                             all_moves.push(square);
                         }
-                        break; 
+                        break;
                     } else {
                         all_moves.push(square);
                     }
-                } else { 
+                } else {
                     break;
                 }
             }
@@ -390,28 +410,31 @@ impl Board {
     fn can_attack_square(&self, from: Square, to: Square) -> bool {
         let current = match self.get_piece(from) {
             Some(p) => p,
-            None => return false
+            None => return false,
         };
 
         let target = match self.get_piece(to) {
             Some(p) => p,
-            None => return false
+            None => return false,
         };
 
         if target.color != current.opposite_color() {
-            return false
+            return false;
         }
 
         match current.piece_type {
             PieceType::Knight => {
                 return PieceType::Knight.get_offsets().iter().any(
-                    | &(rank_offset, file_offset) | {
+                    |&(rank_offset, file_offset)| {
                         from.offset(rank_offset, file_offset).ok() == Some(to)
-                    });
+                    },
+                );
             }
             PieceType::King => {
-                return PieceType::King.get_offsets().iter().any(
-                    | &(rank_offset, file_offset) | {
+                return PieceType::King
+                    .get_offsets()
+                    .iter()
+                    .any(|&(rank_offset, file_offset)| {
                         from.offset(rank_offset, file_offset).ok() == Some(to)
                     });
             }
@@ -423,21 +446,19 @@ impl Board {
 
                 // ToDo: Review this
                 if let Some(passant) = self.en_passant {
-                    if passant.offset(0, -1).ok() == Some(to) || 
-                       passant.offset(0, -1).ok() == Some(to) {
+                    if passant.offset(0, -1).ok() == Some(to)
+                        || passant.offset(0, -1).ok() == Some(to)
+                    {
                         return true;
-                       }
+                    }
                 }
 
-                return from.offset(direction, -1).ok() == Some(to) || 
-                       from.offset(direction, 1).ok() == Some(to);
+                return from.offset(direction, -1).ok() == Some(to)
+                    || from.offset(direction, 1).ok() == Some(to);
             }
-            PieceType::Bishop | 
-            PieceType::Rook | 
-            PieceType::Queen => {
+            PieceType::Bishop | PieceType::Rook | PieceType::Queen => {
                 return self.can_sliding_piece_reach(from, to, current);
             }
-
         }
     }
 
@@ -457,35 +478,39 @@ impl Board {
     }
 
     fn get_all_unchecked_moves(&self, square: Square) -> Vec<Square> {
-        let piece = match self.get_piece(square) { 
+        let piece = match self.get_piece(square) {
             Some(p) => p,
-            None => return Vec::new()
+            None => return Vec::new(),
         };
 
         match piece.piece_type {
             PieceType::Knight => {
-                return PieceType::Knight.get_offsets()
+                return PieceType::Knight
+                    .get_offsets()
                     .iter()
                     .filter_map(|&(rank_offset, file_offset)| {
                         let target = square.offset(rank_offset, file_offset).ok()?;
                         match self.get_piece(target) {
                             Some(p) if p.color == piece.color => None, // Can't capture own piece
-                            _ => Some(target)
+                            _ => Some(target),
                         }
-                    }).collect()
+                    })
+                    .collect();
             }
             PieceType::King => {
-                let mut moves: Vec<Square> = PieceType::King.get_offsets()
+                let mut moves: Vec<Square> = PieceType::King
+                    .get_offsets()
                     .iter()
                     .filter_map(|&(rank_offset, file_offset)| {
                         let target = square.offset(rank_offset, file_offset).ok()?;
                         match self.get_piece(target) {
                             Some(p) if p.color == piece.color => None, // Can't capture own piece
-                            _ => Some(target)
+                            _ => Some(target),
                         }
-                    }).collect();
+                    })
+                    .collect();
 
-                let king_base_rank = if piece.color == Color::White {0} else {7};
+                let king_base_rank = if piece.color == Color::White { 0 } else { 7 };
                 if self.can_king_side_castle(piece.color) {
                     if let Ok(move_square) = Square::new(king_base_rank, 6) {
                         moves.push(move_square);
@@ -521,7 +546,7 @@ impl Board {
                 if let Ok(s1) = square.offset(direction, 0) {
                     if self.get_piece(s1).is_none() {
                         all_moves.push(s1);
-                        
+
                         // Double move from starting position
                         if square.rank() == starting_rank {
                             if let Ok(s2) = square.offset(direction * 2, 0) {
@@ -535,12 +560,12 @@ impl Board {
 
                 // En Passant rule
                 if let Some(passant) = self.en_passant {
-                    
                     for offset in [-1, 1] {
                         if let Ok(square_adjacent) = square.offset(0, offset) {
                             if Some(square_adjacent) == self.en_passant {
                                 if let Some(passant_piece) = self.get_piece(square_adjacent) {
-                                    if passant_piece.color == piece.opposite_color() { // opponent is in en_passant square
+                                    if passant_piece.color == piece.opposite_color() {
+                                        // opponent is in en_passant square
                                         println!("trying en_passant {passant:?}");
                                         if let Ok(s) = square.offset(direction, offset) {
                                             all_moves.push(s);
@@ -552,15 +577,11 @@ impl Board {
                     }
                 }
 
-
                 return all_moves;
             }
-            PieceType::Bishop | 
-            PieceType::Rook | 
-            PieceType::Queen => {
+            PieceType::Bishop | PieceType::Rook | PieceType::Queen => {
                 return self.get_sliding_moves(square, piece);
             }
-
         }
     }
 
@@ -571,7 +592,7 @@ impl Board {
                 let square = Square::new(rank, file).expect("always valid");
                 if let Some(piece) = self.get_piece(square) {
                     if piece.piece_type == PieceType::Pawn {
-                        return Some(square)
+                        return Some(square);
                     }
                 }
             }

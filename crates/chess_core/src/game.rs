@@ -1,4 +1,4 @@
-use crate::{Square, Color, Board, Piece};
+use crate::{Board, Color, Piece, Square};
 
 pub enum MoveType {
     Move,
@@ -17,7 +17,7 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Self {
-        Self { 
+        Self {
             board: Board::new_starting_default(),
             active_player: Color::White,
             selected_square: None,
@@ -67,46 +67,46 @@ impl Game {
         if let Some(piece) = self.board.get_piece(from) {
             // Check if it's a capture before making the move
             let is_capture = self.board.get_piece(to).is_some();
-            
+
             self.board.make_move(from, to);
-            
+
             // Check for check and checkmate after the move
             let opponent_color = self.active_player.opposite();
             let is_checkmate = self.board.is_checkmated(opponent_color);
             let is_check = !is_checkmate && self.board.is_king_in_check(opponent_color);
-            
+
             // Record move in history with proper notation
             let move_notation = to.to_notation();
             let piece_symbol = piece.get_piece_ascii();
-            
+
             // Build move string: [symbol] [capture?] [square] [check/checkmate?]
             let mut move_str = String::new();
-            
+
             // Add piece symbol
             move_str.push_str(&piece_symbol);
-            
+
             // Add capture notation
             if is_capture {
                 move_str.push('x');
             }
-            
+
             // Add square
             move_str.push_str(&move_notation);
-            
+
             // Add check or checkmate notation
             if is_checkmate {
                 move_str.push('#');
             } else if is_check {
                 move_str.push('+');
             }
-            
+
             // Format based on color: White: [full notation], Black: [full notation]
             let move_text = match piece.color {
                 Color::White => move_str,
                 Color::Black => move_str,
             };
             self.move_history.push(move_text);
-            
+
             // Update last move highlight
             self.last_move = Some((from, to));
 
@@ -115,7 +115,7 @@ impl Game {
         }
     }
 
-    pub fn is_checkmated(&self, color: Color) -> bool{
+    pub fn is_checkmated(&self, color: Color) -> bool {
         self.board.is_checkmated(color)
     }
 

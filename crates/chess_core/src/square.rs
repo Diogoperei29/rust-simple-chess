@@ -7,9 +7,9 @@ pub struct Square {
 impl Square {
     pub fn new(rank: u8, file: u8) -> Result<Self, &'static str> {
         if rank < 8 && file < 8 {
-            Ok (Self { rank, file })
+            Ok(Self { rank, file })
         } else {
-            Err ("Tried to create a square out of bounds\n")
+            Err("Tried to create a square out of bounds\n")
         }
     }
 
@@ -34,14 +34,22 @@ impl Square {
         let new_file = self.file as i8 + file_offset;
 
         if new_rank >= 0 && new_rank < 8 && new_file >= 0 && new_file < 8 {
-            Ok (Self { rank: new_rank as u8, file: new_file as u8 })
+            Ok(Self {
+                rank: new_rank as u8,
+                file: new_file as u8,
+            })
         } else {
-            Err ("Tried to create a square out of bounds\n")
+            Err("Tried to create a square out of bounds\n")
         }
     }
 
-    pub fn rank(&self) -> u8 { self.rank }
-    pub fn file(&self) -> u8 { self.file }
-    pub fn rank_file(&self) -> (u8, u8) { return (self.rank, self.file) }
-
+    pub fn rank(&self) -> u8 {
+        self.rank
+    }
+    pub fn file(&self) -> u8 {
+        self.file
+    }
+    pub fn rank_file(&self) -> (u8, u8) {
+        return (self.rank, self.file);
+    }
 }
